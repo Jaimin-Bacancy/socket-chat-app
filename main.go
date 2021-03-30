@@ -17,6 +17,10 @@ var (
 	Server *gosocketio.Server
 )
 
+type Message struct {
+	Text string `json:"message"`
+}
+
 func init() {
 	Server = gosocketio.NewServer(transport.GetDefaultWebsocketTransport())
 	fmt.Println("Socket Inititalize...")
@@ -32,15 +36,17 @@ func LoadSocket() {
 	// socket disconnection
 	Server.On(gosocketio.OnDisconnection, func(c *gosocketio.Channel) {
 		fmt.Println("Disconnected", c.Id())
+
+		// handles when someone closes the tab
 		c.Leave("Room")
 	})
 
 	// chat socket
-	Server.On("/chat", func(c *gosocketio.Channel, message string) string {
-		c.BroadcastTo("Room", "/message", message)
+	Server.On("/chat", func(c *gosocketio.Channel, message Message) string {
+		fmt.Println(message.Text)
+		c.BroadcastTo("Room", "/message", message.Text)
 		return "message sent successfully."
 	})
-
 }
 
 func CreateRouter() {
