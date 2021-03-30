@@ -38,7 +38,6 @@ func LoadSocket() {
 	// chat socket
 	Server.On("/chat", func(c *gosocketio.Channel, message string) string {
 		c.BroadcastTo("Room", "/message", message)
-
 		return "message sent successfully."
 	})
 
